@@ -31,8 +31,3 @@ productsRef.get().then((querySnapshot) => {
     console.error("Error fetching documents: ", error);
 });
 
-
-
-
-
-
