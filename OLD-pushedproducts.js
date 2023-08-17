@@ -1,4 +1,6 @@
 
+// this is how we put the products in 
+
 db.collection("products").doc("1").set(
 {
     id: 1;
@@ -328,3 +330,28 @@ db.collection("products").doc("27").set(
         price: 99,
         img1: "/images/products/home/mug.jpeg",
     });
+
+
+
+
+    // this is how we tested the connection
+    // Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Reference to the 'products' collection
+var productsRef = firebase.firestore().collection('products');
+
+// Fetch all documents from the 'products' collection
+productsRef.get().then((querySnapshot) => {
+    // Loop through each document in the snapshot
+    querySnapshot.forEach((doc) => {
+        // Get the 'description' property of the document
+        var description = doc.data().description;
+        
+        // Console log the 'description'
+        console.log(description);
+    });
+}).catch((error) => {
+    console.error("Error fetching documents: ", error);
+});
