@@ -6,12 +6,49 @@
     <!-- time to get some CSS -->
     <link rel="stylesheet" href="normalize.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                clifford: '#da373d',
+              }
+            }
+          }
+        }
+      </script>
     <title>The Dragon Store</title>
 </head>
 <body>
-    <h1>Header of the website</h1>
+    <section id="navigation">
+        <a href="index.html">take me home plz</a>
+    </section>
+<h1 class="text-3xl font-bold underline text-clifford">Header of the website</h1>
+<section class="pl-5">
     <p>This is a cool piece of text</p>
-    <a href="product.html?id=3">go to product 3</a>
+    <a href="product.html?id=3" class="no-underline hover:underline">go to product 3</a>
+    <div>
+        <ul class="list-disc pl-5">
+            <li>list item one</li>
+            <li>list item two</li>
+            <li>list item three</li>
+            <li>list item four</li>
+            <li>list item five</li>
+        </ul>
+    </div>
+</section>
+<div class="transform hover:scale-105 hover:rotate-3 transition-all shadow hover:shadow-lg transition-shadow bg-gray-200 hover:bg-gray-300 transition-colors max-w-sm rounded overflow-hidden p-6">
+    <img class="w-full h-48 object-contain" src="./images/products/shirts/solo1-old.jpeg" alt="Card image">
+    <div class="px-6 py-4">
+      <h3 class="font-bold text-xl mb-2">Card Title</h3>
+      <p class="text-gray-700 text-base">
+        Some quick example text to build on the card title and make up the bulk of the card's content.
+      </p>
+    </div>
+
+  </div>
     
 
 <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
