@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dragon Dresser</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body class="bg-gray-200 h-screen font-sans">
-
+    
+    
     <!-- Navbar -->
     <nav class="bg-gray-200 p-4 text-white">
         <!-- Container -->
@@ -67,5 +65,17 @@
         });
     </script>
 
+<script src="https://www.gstatic.com/firebasejs/10.2.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore-compat.js"></script>
+<script src="scripts.js"></script>
+
+
+<div class="product-buttons">
+    <button onclick="addProductToCart('1')">Add Product 1 to Cart</button>
+    <button onclick="addProductToCart('2')">Add Product 2 to Cart</button>
+    <button onclick="addProductToCart('3')">Add Product 3 to Cart</button>
+</div>
+
 </body>
 </html>
+<button id="addRandomProduct" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4">Add Random Product to Cart</button>
