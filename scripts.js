@@ -15,8 +15,15 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Firestore
 const db = firebase.firestore();
 
-// Function to add a product to the local storage cart
+// Reference to the 'products' collection
+var productsRef = firebase.firestore().collection('products');
 
+
+
+// CART STUFF BEGINS NOW
+//
+
+// Function to add a product to the local storage cart
 function addToCart(product) {
     const existingProductIndex = cart.findIndex(item => item.id === product.id);
     if (existingProductIndex > -1) {
@@ -72,20 +79,6 @@ document.getElementById('checkoutButton')?.addEventListener('click', () => {
     alert('Proceeding to checkout!');
 });
 
-// Add event listener to the "Add to Cart" button
-document.addEventListener('DOMContentLoaded', function() {
-    const addToCartButton = document.getElementById('addRandomProduct');
-    if (addToCartButton) {
-        addToCartButton.addEventListener('click', function() {
-            console.log('Product added to cart:', mockProduct.name);
-            
-            // Add product to localStorage
-            let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
-            cart.push(mockProduct);
-            localStorage.setItem('cartProducts', JSON.stringify(cart));
-        });
-    }
-});
 
 
 
@@ -133,7 +126,7 @@ if (!cartItemsContainer) return;
         const productElem = document.createElement('li');
         productElem.className = 'cart-item p-4 border rounded';
         
-        // Populate the product details. You can customize this template as per your design needs.
+        // Populate the product details.
         productElem.innerHTML = `
             
 <h3>${product.name} (Quantity: ${product.quantity})</h3>
@@ -167,8 +160,16 @@ function addProductToCart(productId) {
 function saveCartProducts(cartProducts) {
     localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
 }
-// Reference to the 'products' collection
-var productsRef = firebase.firestore().collection('products');
+
+//
+// end cart stuff
+//
+//
+//
+
+
+
+
 
 
 if ( document.URL.includes("product.html") ){
