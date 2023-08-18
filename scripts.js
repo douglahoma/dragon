@@ -1,4 +1,3 @@
-console.log('scripts.js loaded!');
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBopnQ3CXsyJKbpWmOfXnTMERtb9icIEzs",
@@ -40,15 +39,6 @@ function getCartProducts() {
     return JSON.parse(localStorage.getItem('cartProducts')) || [];
 }
 
-// Add random product to the cart when the button is clicked
-document.getElementById('addRandomProduct')?.addEventListener('click', () => {
-    const productIds = ["09lilpgzmQujV3WtOAYv", "IRndB8aRCHq5pyuZNwfz", "LXVdlFQnEtA7xL4QcijW", "SmJsdOB1j0OCL31HKbO8", "brG8Pwy8qV1tZ0O72gHE", "eL6mkHMxLDbC4mq1VdSz", "nph2cGaWZzrfp9bm7Kf5", "wx1xrS0cMs6CyUccuSqM"];
-    const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
-    addToCart(randomProductId);
-    console.log('Random product added to the cart!');
-    alert('Random product added to the cart!');
-});
-
 // When the cart page loads, fetch products from local storage and then retrieve their details from Firestore
 if (document.getElementById('cartItems')) {
     const cartItemsElement = document.getElementById('cartItems');
@@ -82,13 +72,6 @@ document.getElementById('checkoutButton')?.addEventListener('click', () => {
     alert('Proceeding to checkout!');
 });
 
-
-let mockProduct = {
-    id: "12345",
-    name: "Dragon Shirt",
-    price: "$19.99"
-};
-
 // Add event listener to the "Add to Cart" button
 document.addEventListener('DOMContentLoaded', function() {
     const addToCartButton = document.getElementById('addRandomProduct');
@@ -107,23 +90,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function displayCartProducts() {
-    console.log("displayCartProducts function called.");  // Debugging log
 
     // Get the cart from localStorage
     let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
-    console.log("Cart from localStorage:", cart);  // Debugging log
 
     // Find the container in the HTML to display the cart items
     const cartContainer = document.getElementById('cartItems');
     
     if (cartContainer) {
-        console.log("cartItems container found.");  // Debugging log
         // Clear the container
         cartContainer.innerHTML = '';
 
         // Display each product in the cart
         cart.forEach(product => {
-            console.log("Fetching product with ID:", productId.id);  // Debugging log
             db.collection('products').doc(productId.id).get().then((doc) => {
                 if (doc.exists) {
                     let productDetails = doc.data();
@@ -138,11 +117,10 @@ function displayCartProducts() {
             });
         });
     } else {
-        console.log("cartItems container not found.");  // Debugging log
     }
 }
 
-// Function to display cart products in the DragonDresserCart.html page
+// Function to display cart products in the cart.html page
 function displayCartProductsInUI() {
     const cartItemsContainer = document.getElementById('cartItems');
 if (!cartItemsContainer) return;
@@ -168,7 +146,7 @@ if (!cartItemsContainer) return;
     }
 }
 
-// Call the function to display cart products when the DragonDresserCart.html page loads
+// Call the function to display cart products when the cart.html page loads
 document.addEventListener('DOMContentLoaded', displayCartProductsInUI);
 
 function addProductToCart(productId) {
@@ -188,4 +166,64 @@ function addProductToCart(productId) {
 
 function saveCartProducts(cartProducts) {
     localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
+}
+// Reference to the 'products' collection
+var productsRef = firebase.firestore().collection('products');
+
+
+if ( document.URL.includes("product.html") ){
+    console.log("Hey product page, nice");
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    const docRef = db.collection('products').doc(`${id}`);
+
+    docRef.get().then((doc) => {
+        // first we'll make sure the doc is there!
+        if (doc.exists) {
+            // next we'll make a reference to the data object:
+            const data = doc.data();
+            // and next log it to the console for fun:
+            console.log(`name is ${data.name} and description is ${data.description}`);
+            // NOW WE START UPDATING THE PRODCT PAGE, yee-haw!
+            // First, the product name goes into main header:
+            document.getElementById("productheader").innerHTML = `${data.name}`;
+            // Now let's give it a description so nobody rushes to conclusions:
+            document.getElementById("productdescription").innerHTML = `${data.description}`;
+            // Thirdly, the most important thing: the price! (a number)
+            document.getElementById("productprice").innerHTML =`${data.price}`;
+            // And, since each product has at least one image, we can definitely safely populate "image1", our main image
+            document.getElementById("image1").src=`${data.img1}`;
+            // Next we will check for some more images! Shirts have 6, and they are as such:
+            // img1 : an old man who is young at heart
+            // img2 : a cool guy indoors with a dragon wall
+            // img3 : a millenial hiker with a beard
+            // img4 : a kind-looking lady
+            // img5 : a really cool hip guy with a jacket
+            // img6 : a sideways-oriented cool young dude
+            //
+            // re: home goods, some products (like pillows and mugs!) only have a main image, img1, 
+            // while others (like art and boxes!) have 3.
+            // In conclusion, it can vary! So we are careful to check.
+            if (data.img2) {
+                document.getElementById("image2").src = `${data.img2}`;
+            }
+            if (data.img3) {
+                document.getElementById("image3").src = `${data.img3}`;
+            }
+            if (data.img4) {
+                document.getElementById("image4").src = `${data.img4}`;
+            }
+            if (data.img5) {
+                document.getElementById("image5").src = `${data.img5}`;
+            }
+            if (data.img6) {
+                document.getElementById("image6").src = `${data.img6}`;
+            }
+
+        } else {
+            console.log("no document found in the database :(");
+            location.replace('404.html');
+        }
+    })
+    
 }
