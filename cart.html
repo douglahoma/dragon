@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="normalize.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
-
 </head>
 <body>
     <header class="bg-gray-500 text-white py-4">
@@ -90,11 +89,22 @@
       </header>
 
     <!-- Content container -->
+
+<div id="cartDisplay"></div>
     <div class="container mx-auto mt-10 p-4 bg-white rounded shadow-lg">
-        <!-- Placeholder content for the landing page -->
-        <h1 class="text-2xl font-bold mb-4">Welcome to Dragon Dresser</h1>
-        <p>Your one-stop shop for the best dragon attire!</p>
+        <!-- Products List -->
+        <ul id="cartItems" class="space-y-4">
+            <!-- Products will be appended here by the script -->
+        </ul>
+
+        <!-- Checkout Button -->
+        <button id="checkoutButton"
+            class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Proceed to Checkout
+        </button>
+
     </div>
+
     <!-- Footer -->
     <footer class="bg-gray-500 text-white py-8">
         <!-- Main container -->
@@ -124,6 +134,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.2.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore-compat.js"></script>
 <script src="scripts.js"></script>
+<script src="cart_script.js"></script>
 
 </body>
 </html>

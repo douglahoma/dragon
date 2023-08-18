@@ -1,21 +1,175 @@
-
-
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBopnQ3CXsyJKbpWmOfXnTMERtb9icIEzs",
-  authDomain: "holbertont3webapp.firebaseapp.com",
-  projectId: "holbertont3webapp",
-  storageBucket: "holbertont3webapp.appspot.com",
-  messagingSenderId: "418817488381",
-  appId: "1:418817488381:web:55575f6d63231118e79594",
-  measurementId: "G-LKN9DB8F2N"
-};
+    apiKey: "AIzaSyBopnQ3CXsyJKbpWmOfXnTMERtb9icIEzs",
+    authDomain: "holbertont3webapp.firebaseapp.com",
+    projectId: "holbertont3webapp",
+    storageBucket: "holbertont3webapp.appspot.com",
+    messagingSenderId: "418817488381",
+    appId: "1:418817488381:web:55575f6d63231118e79594",
+    measurementId: "G-LKN9DB8F2N"
+  };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+
+// Initialize Firestore
 const db = firebase.firestore();
 
 // Reference to the 'products' collection
 var productsRef = firebase.firestore().collection('products');
+
+
+
+// CART STUFF BEGINS NOW
+//
+
+// Function to add a product to the local storage cart
+function addToCart(product) {
+    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+    if (existingProductIndex > -1) {
+        // Product already exists in cart, increment quantity
+        cart[existingProductIndex].quantity += 1;
+    } else {
+        // Product doesn't exist in cart, add it with quantity = 1
+        product.quantity = 1;
+        cart.push(product);
+    }
+    saveCartProducts(cart);  // Save the updated cart to localStorage
+}
+
+    let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
+    
+
+
+// Function to get products from the local storage cart
+function getCartProducts() {
+    return JSON.parse(localStorage.getItem('cartProducts')) || [];
+}
+
+// When the cart page loads, fetch products from local storage and then retrieve their details from Firestore
+if (document.getElementById('cartItems')) {
+    const cartItemsElement = document.getElementById('cartItems');
+    const cartProducts = getCartProducts();
+    
+    
+for(let i = 0; i < cartProducts.length; i++) {
+    let productId = cartProducts[i];
+    
+        db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
+            if (doc.exists) {
+                const product = doc.data();
+                const listItem = document.createElement('li');
+                listItem.className = 'flex flex-col justify-between py-2 border-b mb-4';
+                listItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold">${product.name}</span>
+                        <span>$${(typeof product.price === "number" ? product.price.toFixed(2) : "N/A")}</span>
+                    </div>
+                    <img src="${product.images && product.images.length > 0 ? product.images[0] : "path/to/default/image.png"}" alt="${product.name}" class="w-32 h-32 object-cover rounded mt-2">
+                    <div>${product.description || "Description not available."}</div>
+                    <div class="mt-2 text-sm text-gray-500">Category: ${product.category || "N/A"}</div>
+                `;
+                cartItemsElement.appendChild(listItem);
+            }
+        });
+    };
+}
+
+document.getElementById('checkoutButton')?.addEventListener('click', () => {
+    alert('Proceeding to checkout!');
+});
+
+
+
+
+function displayCartProducts() {
+
+    // Get the cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
+
+    // Find the container in the HTML to display the cart items
+    const cartContainer = document.getElementById('cartItems');
+    
+    if (cartContainer) {
+        // Clear the container
+        cartContainer.innerHTML = '';
+
+        // Display each product in the cart
+        cart.forEach(product => {
+            db.collection('products').doc(productId.id).get().then((doc) => {
+                if (doc.exists) {
+                    let productDetails = doc.data();
+                    let productElem = document.createElement('li');
+                    productElem.className = 'cart-item';
+                    productElem.innerHTML = `
+                        <h3>${productDetails.name}</h3>
+                        <p>Price: ${productDetails.price}</p>
+                    `;
+                    cartContainer.appendChild(productElem);
+                }
+            });
+        });
+    } else {
+    }
+}
+
+// Function to display cart products in the cart.html page
+function displayCartProductsInUI() {
+    const cartItemsContainer = document.getElementById('cartItems');
+if (!cartItemsContainer) return;
+    const cartProducts = getCartProducts();  // Fetch cart products from localStorage
+    
+    // Clear previous items
+    cartItemsContainer.innerHTML = '';
+    
+    for (let product of cartProducts) {
+        const productElem = document.createElement('li');
+        productElem.className = 'cart-item p-4 border rounded';
+        
+        // Populate the product details.
+        productElem.innerHTML = `
+            
+<h3>${product.name} (Quantity: ${product.quantity})</h3>
+
+            <p>Price: ${product.price}</p>
+        `;
+        
+        // Append the product element to the cartItems container
+        cartItemsContainer.appendChild(productElem);
+    }
+}
+
+// Call the function to display cart products when the cart.html page loads
+document.addEventListener('DOMContentLoaded', displayCartProductsInUI);
+
+function addProductToCart(productId) {
+    db.collection('products').doc(productId).get().then(doc => {
+        if (doc.exists) {
+            // Add the product to the cart
+            const productData = doc.data();
+            addToCart({id: doc.id, ...productData});
+            alert(productData.name + " has been added to the cart!");
+        } else {
+            alert("Product not found!");
+        }
+    }).catch(error => {
+        console.error("Error fetching product:", error);
+    });
+}
+
+function saveCartProducts(cartProducts) {
+    localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
+}
+
+//
+// end cart stuff
+//
+//
+//
+
+
+
+
 
 
 if ( document.URL.includes("product.html") ){
