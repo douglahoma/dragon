@@ -67,3 +67,5 @@ node_modules/
 
 # mac stuff
 .DS_Store
+
+./node_modules
