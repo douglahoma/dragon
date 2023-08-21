@@ -192,6 +192,10 @@ if ( document.URL.includes("product.html") ){
             document.getElementById("productdescription").innerHTML = `${data.description}`;
             // Thirdly, the most important thing: the price! (a number)
             document.getElementById("productprice").innerHTML =`${data.price}`;
+            // Fourthly, we'll configure the add to cart button:
+            document.getElementById("productaddbutton").addEventListener("click", function() {
+                addProductToCart(`${id}`);
+            });
             // And, since each product has at least one image, we can definitely safely populate "image1", our main image
             document.getElementById("image1").src=`${data.img1}`;
             // Next we will check for some more images! Shirts have 6, and they are as such:
