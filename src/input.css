@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.product-card {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .overlay {
+    display: none; /* Hidden by default */
+  }
+  
+  .product-card:hover .overlay {
+    display: block; /* Shown on hover */
+  }
+  
