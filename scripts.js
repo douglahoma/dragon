@@ -240,6 +240,8 @@ if ( document.URL.includes("product.html") ){
 
 // cardMaker function 
 function cardMaker(product) {
+    const linky = document.createElement('a');
+    linky.href = `product.html?id=${product.item}`;
     // Create the main product card container
     const card = document.createElement('div');
     card.className = 'product-card p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform transition duration-300 ease-in-out cursor-pointer w-full max-w-sm mx-auto';
@@ -278,6 +280,7 @@ function cardMaker(product) {
   
     // Create the overlay with description
     const overlay = document.createElement('div');
+    console.log("overlay created");
     overlay.className = 'overlay bg-black bg-opacity-50 text-white p-4 absolute top-0 left-0 w-full h-full hidden group-hover:block';
   
     const description = document.createElement('p');
@@ -286,9 +289,11 @@ function cardMaker(product) {
   
     overlay.appendChild(description);
     card.appendChild(overlay);
+    // put the card in the link
+    linky.appendChild(card);
   
     // Append the card to the container
-    document.getElementById('collectionResults').appendChild(card);
+    document.getElementById('collectionResults').appendChild(linky);
   }
 
 

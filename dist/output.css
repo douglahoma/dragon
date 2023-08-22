@@ -1044,6 +1044,21 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.overlay {
+  display: none;
+  /* Hidden by default */
+}
+
+.product-card:hover .overlay {
+  display: block;
+  /* Shown on hover */
+}
+
 .hover\:scale-105:hover {
   --tw-scale-x: 1.05;
   --tw-scale-y: 1.05;
@@ -1150,3 +1165,4 @@ video {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
+  
