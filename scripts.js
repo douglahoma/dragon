@@ -48,32 +48,23 @@ function getCartProducts() {
 
 // When the cart page loads, fetch products from local storage and then retrieve their details from Firestore
 if (document.getElementById('cartItems')) {
-    const cartItemsElement = document.getElementById('cartItems');
-    const cartProducts = getCartProducts();
     
-    
+const cartItemsElement = document.getElementById('cartItems');
+const cartProducts = getCartProducts();
+
 for(let i = 0; i < cartProducts.length; i++) {
     let productId = cartProducts[i];
     
-        db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
-            if (doc.exists) {
-                const product = doc.data();
-                const listItem = document.createElement('li');
-                listItem.className = 'flex flex-col justify-between py-2 border-b mb-4';
-                listItem.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold">${product.name}</span>
-                        <span>$${(typeof product.price === "number" ? product.price.toFixed(2) : "N/A")}</span>
-                    </div>
-                    <img src="${product.images && product.images.length > 0 ? product.images[0] : "path/to/default/image.png"}" alt="${product.name}" class="w-32 h-32 object-cover rounded mt-2">
-                    <div>${product.description || "Description not available."}</div>
-                    <div class="mt-2 text-sm text-gray-500">Category: ${product.category || "N/A"}</div>
-                `;
-                cartItemsElement.appendChild(listItem);
-            }
-        });
-    };
+    db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
+        if (doc.exists) {
+            const product = doc.data();
+            product.id = doc.id;  // Ensuring the product has its ID
+            renderCartProduct(product);  // Using the previously defined function to render the product with quantity controls
+        }
+    });
 }
+
+            }
 
 document.getElementById('checkoutButton')?.addEventListener('click', () => {
     alert('Proceeding to checkout!');
@@ -159,6 +150,74 @@ function addProductToCart(productId) {
 
 function saveCartProducts(cartProducts) {
     localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
+}
+// Function to render cart products
+function renderCartProduct(product) {
+    const cartItemsElement = document.getElementById('cartItems');
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center my-2';
+    
+    const productNameSpan = document.createElement('span');
+    productNameSpan.className = 'product-name';
+    productNameSpan.textContent = product.name;
+    
+    const quantityControlDiv = document.createElement('div');
+    quantityControlDiv.className = 'quantity-control flex items-center';
+    
+    const minusButton = document.createElement('button');
+    minusButton.className = 'minus-btn bg-gray-200 p-2 rounded-l';
+    minusButton.textContent = '-';
+    minusButton.addEventListener('click', () => adjustQuantity(product, -1));
+    
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = product.quantity;
+    input.min = '1';
+    input.className = 'quantity-input w-16 text-center';
+    input.setAttribute('data-product-id', product.id);
+    input.addEventListener('change', adjustQuantityFromInput);
+    
+    const plusButton = document.createElement('button');
+    plusButton.className = 'plus-btn bg-gray-200 p-2 rounded-r';
+    plusButton.textContent = '+';
+    plusButton.addEventListener('click', () => adjustQuantity(product, 1));
+    
+    quantityControlDiv.appendChild(minusButton);
+    quantityControlDiv.appendChild(input);
+    quantityControlDiv.appendChild(plusButton);
+    
+    li.appendChild(productNameSpan);
+    li.appendChild(quantityControlDiv);
+    
+    cartItemsElement.appendChild(li);
+}
+
+// Function to adjust quantity using Plus and Minus buttons
+function adjustQuantity(product, adjustment) {
+    const inputElement = document.querySelector(`.quantity-input[data-product-id="${product.id}"]`);
+    let newQuantity = parseInt(inputElement.value) + adjustment;
+    newQuantity = Math.max(newQuantity, 1);  // Ensure quantity is at least 1
+    inputElement.value = newQuantity;
+    inputElement.dispatchEvent(new Event('change'));
+}
+
+// Function to handle manual input in the quantity text box
+function adjustQuantityFromInput(e) {
+    const productId = e.target.getAttribute('data-product-id');
+    const newQuantity = parseInt(e.target.value);
+
+    // Find product in the cart and update its quantity
+    const productIndex = cart.findIndex(item => item.id === productId);
+    if (productIndex > -1) {
+        cart[productIndex].quantity = newQuantity;
+        saveCartProducts(cart);  // Save the updated cart to localStorage
+    }
+}
+
+// When the cart page loads, fetch products from local storage and then render them using renderCartProduct function
+if (document.getElementById('cartItems')) {
+    const cartProducts = getCartProducts();
+    cartProducts.forEach(product => renderCartProduct(product));
 }
 
 //
