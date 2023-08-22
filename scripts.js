@@ -232,3 +232,97 @@ if ( document.URL.includes("product.html") ){
     })
     
 }
+
+
+
+// COLLECTION CODE: querying and displaying products from the DB
+
+
+// cardMaker function 
+function cardMaker(product) {
+    // Create the main product card container
+    const card = document.createElement('div');
+    card.className = 'product-card p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform transition duration-300 ease-in-out cursor-pointer w-full max-w-sm mx-auto';
+    // Create the aspect ratio container and image
+    const aspectRatioContainer = document.createElement('div');
+    aspectRatioContainer.className = 'aspect-ratio-container relative pb-[80%]';
+  
+    const img = document.createElement('img');
+    img.className = 'absolute top-0 left-0 w-full h-full object-cover rounded-t-lg';
+    img.src = product.img1; // the old man shirt
+    img.alt = 'Product Image';
+  
+    aspectRatioContainer.appendChild(img);
+    card.appendChild(aspectRatioContainer);
+  
+    // Create the details container
+    const details = document.createElement('div');
+    details.className = 'p-4';
+  
+    const name = document.createElement('h3');
+    name.className = 'text-lg font-semibold mb-2';
+    name.textContent = product.name;
+  
+    const category = document.createElement('p');
+    category.className = 'text-sm text-gray-500';
+    category.textContent = product.category;
+  
+    const price = document.createElement('p');
+    price.className = 'text-md font-bold';
+    price.textContent = `$${product.price}`;
+  
+    details.appendChild(name);
+    details.appendChild(category);
+    details.appendChild(price);
+    card.appendChild(details);
+  
+    // Create the overlay with description
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay bg-black bg-opacity-50 text-white p-4 absolute top-0 left-0 w-full h-full hidden group-hover:block';
+  
+    const description = document.createElement('p');
+    description.className = 'text-center';
+    description.textContent = product.description;
+  
+    overlay.appendChild(description);
+    card.appendChild(overlay);
+  
+    // Append the card to the container
+    document.getElementById('collectionResults').appendChild(card);
+  }
+
+
+
+
+// NOW WE CHECK TO SEE IF WE ARE ON THE COLLECTION PAGE
+
+if ( document.URL.includes("collection.html") ) {
+    console.log("collections are cool");
+    const urlParams = new URLSearchParams(window.location.search);
+    if ( urlParams.has("category") ) {
+    const categoryToGet = urlParams.get('category');
+    console.log("Category to get:", categoryToGet);
+    document.getElementById("collectionName").innerHTML = `${categoryToGet}`;
+    // db.collection("products").where("category", "==", categoryToGet).get().then((querySnapshot) => {
+    //     querySnapshot.forEach((doc) => {
+    //         console.log("hey");
+    //         const stuff = doc.data();
+    //         console.log(`${stuff.img2}`);
+    //     })
+    // });
+    db.collection("products").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let productInfo = doc.data();
+            if (productInfo.category == categoryToGet) {
+                cardMaker(productInfo);
+        };
+      });
+})} else {
+    db.collection("products").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let productInfo = doc.data();
+            cardMaker(productInfo);
+        }
+      );
+})
+}}
