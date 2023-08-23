@@ -94,7 +94,10 @@ function displayCartProducts() {
                     productElem.className = 'cart-item';
                     productElem.innerHTML = `
                         <h3>${productDetails.name}</h3>
-                        <p>Price: ${productDetails.price}</p>
+                        
+    <p>Price: ${productDetails.price}</p>
+    <button class="remove-btn bg-red-500 text-white px-4 py-2 rounded" onclick="removeProductFromCart('${productDetails.id}')">Remove</button>
+
                     `;
                     cartContainer.appendChild(productElem);
                 }
@@ -152,15 +155,35 @@ function saveCartProducts(cartProducts) {
     localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
 }
 // Function to render cart products
+
 function renderCartProduct(product) {
+function adjustQuantity(productId, adjustment) {
+    let quantityInput = document.querySelector(`#product-${productId} .quantity-input`);
+    let currentQuantity = parseInt(quantityInput.value);
+    let newQuantity = currentQuantity + adjustment;
+
+    if (newQuantity < 0) newQuantity = 0;
+
+    quantityInput.value = newQuantity;
+
+    // Update the product's quantity in local storage
+    let cartProductIndex = cart.findIndex(product => product.id === productId);
+    if (cartProductIndex !== -1) {
+        cart[cartProductIndex].quantity = newQuantity;
+        saveCartProducts();  // Save the updated cart to local storage
+    }
+
+
     const cartItemsElement = document.getElementById('cartItems');
     const li = document.createElement('li');
     li.className = 'flex justify-between items-center my-2';
     
-    const productNameSpan = document.createElement('span');
-    productNameSpan.className = 'product-name';
-    productNameSpan.textContent = product.name;
+    // Product details
+    const productDetailsSpan = document.createElement('span');
+    productDetailsSpan.className = 'product-details flex-grow';
+    productDetailsSpan.textContent = `${product.name} (Quantity: ${product.quantity || 1}) - Price: ${product.price}`;
     
+    // Quantity controls
     const quantityControlDiv = document.createElement('div');
     quantityControlDiv.className = 'quantity-control flex items-center';
     
@@ -169,40 +192,46 @@ function renderCartProduct(product) {
     minusButton.textContent = '-';
     minusButton.addEventListener('click', () => adjustQuantity(product, -1));
     
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.value = product.quantity;
+    const inputElement = document.createElement('input');
+    inputElement.type = 'number';
+    inputElement.value = product.quantity || 1;
     input.min = '1';
-    input.className = 'quantity-input w-16 text-center';
-    input.setAttribute('data-product-id', product.id);
-    input.addEventListener('change', adjustQuantityFromInput);
-    
-    const plusButton = document.createElement('button');
-    plusButton.className = 'plus-btn bg-gray-200 p-2 rounded-r';
-    plusButton.textContent = '+';
-    plusButton.addEventListener('click', () => adjustQuantity(product, 1));
-    
-    quantityControlDiv.appendChild(minusButton);
-    quantityControlDiv.appendChild(input);
-    quantityControlDiv.appendChild(plusButton);
-    
-    li.appendChild(productNameSpan);
-    li.appendChild(quantityControlDiv);
-    
-    cartItemsElement.appendChild(li);
-}
+    input.max = '10';
+    input.readOnly = true;  //
 
-// Function to adjust quantity using Plus and Minus buttons
+    // If the quantity is zero, remove the product from the cart
+    if (newQuantity <= 0) {
+        cart.splice(cartProductIndex, 1);
+        saveCartProducts();
+        displayCartProductsInUI();  // Update the UI to reflect the changes
+    }
+}
+//
 function adjustQuantity(product, adjustment) {
-    const inputElement = document.querySelector(`.quantity-input[data-product-id="${product.id}"]`);
+    const inputElement = document.querySelector(`.quantity-input[data-product-id=\"${product.id}\"]`);
+    
     let newQuantity = parseInt(inputElement.value) + adjustment;
-    newQuantity = Math.max(newQuantity, 1);  // Ensure quantity is at least 1
-    inputElement.value = newQuantity;
+    newQuantity = Math.max(newQuantity, 1);  // Ensure quantity doesn't go below 1
+
+    // Update the quantity in local storage
+    const cartProducts = JSON.parse(localStorage.getItem('cartProducts')) || [];
+    const productIndex = cartProducts.findIndex(p => p.id === product.id);
+    if (productIndex !== -1) {
+        cartProducts[productIndex].quantity = newQuantity;
+        localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
+    }
+
+    // Reflect the updated quantity in the UI
+    quantityInputElement.value = newQuantity;
+}
+// Ensure quantity is at least 1
+    quantityInputElement.value = newQuantity;
     inputElement.dispatchEvent(new Event('change'));
 }
 
 // Function to handle manual input in the quantity text box
 function adjustQuantityFromInput(e) {
+    const inputElement = e.target;
     const productId = e.target.getAttribute('data-product-id');
     const newQuantity = parseInt(e.target.value);
 
@@ -218,6 +247,14 @@ function adjustQuantityFromInput(e) {
 if (document.getElementById('cartItems')) {
     const cartProducts = getCartProducts();
     cartProducts.forEach(product => renderCartProduct(product));
+}
+function removeProductFromCart(productId) {
+    let cartProductIndex = cart.findIndex(product => product.id === productId);
+    if (cartProductIndex !== -1) {
+        cart.splice(cartProductIndex, 1);
+        saveCartProducts();  // Save the updated cart to local storage
+        displayCartProductsInUI();  // Update the UI to reflect the changes
+    }
 }
 
 //
@@ -373,20 +410,5 @@ if ( document.URL.includes("collection.html") ) {
     //         const stuff = doc.data();
     //         console.log(`${stuff.img2}`);
     //     })
-    // });
-    db.collection("products").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            let productInfo = doc.data();
-            if (productInfo.category == categoryToGet) {
-                cardMaker(productInfo);
-        };
-      });
-})} else {
-    db.collection("products").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            let productInfo = doc.data();
-            cardMaker(productInfo);
-        }
-      );
-})
-}}
+    //
+    }}
