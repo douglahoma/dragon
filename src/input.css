@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwind typography;
 
 .product-card {
     position: relative;
@@ -15,3 +16,66 @@
     display: block; /* Shown on hover */
   }
   
+
+
+.titlescale {
+  transform: scale(.2);
+  animation: scale 3s forwards cubic-bezier(0.5, 1, .9, 1);
+}
+@keyframes scale {
+  100% {
+    transform: scale(1);
+  }
+}
+
+.titlefade {
+  filter: blur(5px);
+}
+
+.titlefade:nth-child(1) {
+  animation: fade-in 0.2s 0.1s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+
+.titlefade:nth-child(2) {
+  animation: fade-in 0.8s 0.4s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+
+.titlefade:nth-child(3) {
+  animation: fade-in 0.8s 0.8s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+
+.titlefade:nth-child(4) {
+  animation: fade-in 0.8s 1.5s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+
+@keyframes fade-in {
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+
+#homepage {
+  background-image: url(../images/backgrounds/dragon-spooky.png);
+  height: 500px; /* You must set a specified height */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+#homepage-subhero {
+  background-image: url(../images/backgrounds/dragon-dude.png);
+  height: 500px; /* You must set a specified height */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+}
+
+#emailform {
+  background-image: url(../images/backgrounds/email-form.png);
+  height: 500px; /* You must set a specified height */
+  background-position: cover; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+}
