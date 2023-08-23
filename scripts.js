@@ -120,6 +120,27 @@ if (!cartItemsContainer) return;
         const productElem = document.createElement('li');
         productElem.className = 'cart-item p-4 border rounded';
         
+        const inputElement = document.createElement("input");
+        inputElement.type = "number";
+        inputElement.className = "quantity-input";
+        inputElement.setAttribute("data-product-id", product.id);
+        inputElement.value = product.quantity || 1;
+        inputElement.min = "1";
+        inputElement.max = "10";
+        inputElement.readOnly = true;
+        productElem.appendChild(inputElement);
+        // Create decrement button
+        const minusButton = document.createElement("button");
+        minusButton.innerHTML = "-";
+        minusButton.onclick = () => adjustQuantity(product.id, -1);
+        productElem.appendChild(minusButton);
+
+        // Create increment button
+        const plusButton = document.createElement("button");
+        plusButton.innerHTML = "+";
+        plusButton.onclick = () => adjustQuantity(product.id, 1);
+        productElem.appendChild(plusButton);
+        productElem.appendChild(inputElement);
         // Populate the product details.
         productElem.innerHTML = `
             
@@ -195,9 +216,11 @@ function adjustQuantity(productId, adjustment) {
     const inputElement = document.createElement('input');
     inputElement.type = 'number';
     inputElement.value = product.quantity || 1;
-    input.min = '1';
-    input.max = '10';
-    input.readOnly = true;  //
+    inputElement.className = 'quantity-input';
+    inputElement.setAttribute("data-product-id", product.id);
+    inputElement.min = '1';
+    inputElement.max = '10';
+    inputElement.readOnly = true;  //
 
     // If the quantity is zero, remove the product from the cart
     if (newQuantity <= 0) {
@@ -222,13 +245,15 @@ function adjustQuantity(product, adjustment) {
     }
 
     // Reflect the updated quantity in the UI
-    quantityInputElement.value = newQuantity;
-}
+    if (inputElement) {
+        inputElement.dispatchEvent(new Event('change'));
+    }
 // Ensure quantity is at least 1
-    quantityInputElement.value = newQuantity;
-    inputElement.dispatchEvent(new Event('change'));
-}
+    const quantityInputElement = document.querySelector(`.quantity-input[data-product-id="${product.id}"]`);
+    quantityInputElement.dispatchEvent(new Event('change'));
+    if (quantityInputElement) {
 
+    }
 // Function to handle manual input in the quantity text box
 function adjustQuantityFromInput(e) {
     const inputElement = e.target;
@@ -411,4 +436,4 @@ if ( document.URL.includes("collection.html") ) {
     //         console.log(`${stuff.img2}`);
     //     })
     //
-    }}
+    }}}}
