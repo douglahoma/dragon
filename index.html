@@ -129,12 +129,20 @@
           <p class="text-left titlefade text-7xl">A Dragon.</p>
         </div>
     </div>
-    <div class="container mx-auto" id="emailform">
-      <p>this is a placeholder paragraph, put your email here though</p>
-      <input type='email'> 
-    </div>
+    <!-- <div class="container mx-auto flex items-center justify-end h-full" id="emailform">
+      <div class="text-right mr-5"> <!-- This div wraps the content and aligns the text to the right -->
+        <!-- <p class="text-white">Enter your email for discounts!</p>
+        <input type="email" class="w-64"> <!-- Width of the input is set to a fixed value -->
+      <!-- </div>
+    </div> -->
+    <form id="emailform" action="https://formspree.io/f/mqkvqyep" method="post" class="container mx-auto flex flex-col items-center justify-center space-y-4">
+      <label for="email" class="text-lg font-semibold">Enter your email for discounts:</label>
+      <input type="email" id="email" name="email" placeholder="DragonFan@dragonmail.com" class="w-64 p-2 border rounded shadow" required>
+      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Submit</button>
+    </form>
+    
     <div class="container mx-auto bg-white h-screen " id="homepage-subhero">
-      <!-- Placeholder content for the landing page -->
+
       <div>
         <p class="text-right text-7xl">Scale</p>
         <p class="text-right text-7xl">Up</p>

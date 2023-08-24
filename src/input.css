@@ -66,16 +66,16 @@
 
 #homepage-subhero {
   background-image: url(../images/backgrounds/dragon-dude.png);
-  height: 500px; /* You must set a specified height */
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
+  height: 500px; 
+  background-position: center; 
+  background-repeat: no-repeat; 
+  background-size: contain; 
 }
 
 #emailform {
   background-image: url(../images/backgrounds/email-form.png);
-  height: 500px; /* You must set a specified height */
-  background-position: cover; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
+  height: 500px;
+  background-position: center; 
+  background-repeat: no-repeat; 
+  background-size: contain;
 }
