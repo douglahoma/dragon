@@ -51,8 +51,10 @@ if (document.getElementById('cartItems')) {
     
 const cartItemsElement = document.getElementById('cartItems');
 const cartProducts = getCartProducts();
+    const uniqueCartProductIds = [...new Set(cartProducts.map(p => p.id))];
+    
 
-for(let i = 0; i < cartProducts.length; i++) {
+for(let i = 0; i < uniqueCartProductIds.length; i++) {
     let productId = cartProducts[i];
     
     db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
@@ -69,66 +71,6 @@ for(let i = 0; i < cartProducts.length; i++) {
 document.getElementById('checkoutButton')?.addEventListener('click', () => {
     alert('Proceeding to checkout!');
 });
-
-function displayCartProducts() {
-
-    // Get the cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
-
-    // Find the container in the HTML to display the cart items
-    const cartContainer = document.getElementById('cartItems');
-    
-    if (cartContainer) {
-        // Clear the container
-        cartContainer.innerHTML = '';
-
-        // Display each product in the cart
-        cart.forEach(product => {
-            db.collection('products').doc(productId.id).get().then((doc) => {
-                if (doc.exists) {
-                    let productDetails = doc.data();
-                    let productElem = document.createElement('li');
-                    productElem.className = 'cart-item';
-                    productElem.innerHTML = `
-                        <h3>${productDetails.name}</h3>
-                        <p>Price: ${productDetails.price}</p>
-                    `;
-                    cartContainer.appendChild(productElem);
-                }
-            });
-        });
-    } else {
-    }
-}
-
-// Function to display cart products in the cart.html page
-function displayCartProductsInUI() {
-    const cartItemsContainer = document.getElementById('cartItems');
-if (!cartItemsContainer) return;
-    const cartProducts = getCartProducts();  // Fetch cart products from localStorage
-    
-    // Clear previous items
-    cartItemsContainer.innerHTML = '';
-    
-    for (let product of cartProducts) {
-        const productElem = document.createElement('li');
-        productElem.className = 'cart-item p-4 border rounded';
-        
-        // Populate the product details.
-        productElem.innerHTML = `
-            
-<h3>${product.name} (Quantity: ${product.quantity})</h3>
-
-            <p>Price: ${product.price}</p>
-        `;
-        
-        // Append the product element to the cartItems container
-        cartItemsContainer.appendChild(productElem);
-    }
-}
-
-// Call the function to display cart products when the cart.html page loads
-document.addEventListener('DOMContentLoaded', displayCartProductsInUI);
 
 function addProductToCart(productId) {
     db.collection('products').doc(productId).get().then(doc => {
@@ -168,7 +110,7 @@ function renderCartProduct(product) {
     
     const input = document.createElement('input');
     input.type = 'number';
-    input.value = product.quantity;
+    input.value = product.quantity.toString();
     input.min = '1';
     input.className = 'quantity-input w-16 text-center';
     input.setAttribute('data-product-id', product.id);
@@ -185,49 +127,31 @@ function renderCartProduct(product) {
     
     li.appendChild(productNameSpan);
     li.appendChild(quantityControlDiv);
-
-// Function to adjust quantity using Plus and Minus buttons
-
-function adjustQuantityFromInput(event) {
-    const inputElement = event.target;
-    const productId = inputElement.getAttribute('data-product-id');
-    const newQuantity = parseInt(inputElement.value) || 1;  // Use 1 if the value is not a valid number
-
-    const cart = getCartProducts();
-    const productIndex = cart.findIndex(p => p.id === productId);
-    if (productIndex > -1) {
-        cart[productIndex].quantity = newQuantity;
-        saveCartProducts(cart);  // Save the updated cart to localStorage
-    }
+    
+    cartItemsElement.appendChild(li);
 }
 
+// Function to adjust quantity using Plus and Minus buttons
 function adjustQuantity(product, adjustment) {
     const inputElement = document.querySelector(`.quantity-input[data-product-id="${product.id}"]`);
-    let currentQuantity = parseInt(inputElement.value) || 0;  // Use 0 if the value is not a valid number
-    let newQuantity = currentQuantity + adjustment;
-
-    if (newQuantity === 0) {
-        const shouldRemove = confirm("Do you want to remove this item from the cart?");
-        if (!shouldRemove) {
-            return;  // Exit the function if the user does not confirm removal
-        }
-    }
-
+    let newQuantity = parseInt(inputElement.value) + adjustment;
     newQuantity = Math.max(newQuantity, 1);  // Ensure quantity is at least 1
     inputElement.value = newQuantity;
     inputElement.dispatchEvent(new Event('change'));
 }
 
-    
-const productIndex = cart.findIndex(p => p.id === product.id);
-if (productIndex > -1) {
-    cart[productIndex].quantity = newQuantity;
-    saveCartProducts(cart);  // Save the updated cart to localStorage
-}
+// Function to handle manual input in the quantity text box
+function adjustQuantityFromInput(e) {
+    const productId = e.target.getAttribute('data-product-id');
+    const newQuantity = parseInt(e.target.value);
 
+    // Find product in the cart and update its quantity
+    const productIndex = cart.findIndex(item => item.id === productId);
+    if (productIndex > -1) {
         cart[productIndex].quantity = newQuantity;
         saveCartProducts(cart);  // Save the updated cart to localStorage
     }
+}
 
 // When the cart page loads, fetch products from local storage and then render them using renderCartProduct function
 if (document.getElementById('cartItems')) {
@@ -240,6 +164,9 @@ if (document.getElementById('cartItems')) {
 //
 //
 //
+
+
+
 
 
 
