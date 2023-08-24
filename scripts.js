@@ -331,33 +331,93 @@ if ( document.URL.includes("collection.html") ) {
 })
 }}
 
-// make an object to keep track of hidden-ness
-const styleState = {
+// // make an object to keep track of hidden-ness
+// const styleState = {
+//     patterned: true,
+//     normal: true,
+//     subtle: true,
+// }
+
+// function filterCards(style) {
+//     // first we toggle the state object that keeps track of what is shown:
+//     styleState[style] = !styleState[style];
+//     // then we grab the cards on the page
+//     const thisStyleCardsOnPage = document.querySelectorAll(`.style-${style}`);
+//     thisStyleCardsOnPage.forEach(cardOfThisStyle => {
+//         if (!styleState[style]) {
+//             cardOfThisStyle.classList.remove('hidden');
+//           } else {
+//             cardOfThisStyle.classList.add('hidden');
+//           }
+//     });
+// }
+
+// function toggleButton(button) {
+//     if (button.classList.contains('bg-green-400')) {
+//       button.classList.remove('bg-green-400', 'text-white');
+//       button.classList.add('bg-gray-300', 'text-gray-700');
+//     } else {
+//       button.classList.remove('bg-gray-300', 'text-gray-700');
+//       button.classList.add('bg-green-400', 'text-white');
+//     }
+//   }
+  
+
+// document.getElementById("togglePatterned").addEventListener("click", function() {
+//     filterCards("patterned");
+// });
+// document.getElementById("toggleSubtle").addEventListener("click", function() {
+//     filterCards("subtle");
+// });
+// document.getElementById("toggleNormal").addEventListener("click", function() {
+//     filterCards("normal");
+// });
+
+// function toggleButtonAndFilter(button, style) {
+//     toggleButton(button);
+//     filterCards(style);
+//   }
+
+
+
+
+
+  const styleState = {
     patterned: true,
     normal: true,
     subtle: true,
+};
+
+function toggleButtonAndFilter(button, style) {
+    // Toggle the visual appearance of the button first
+    toggleButton(button);
+    // Then filter the cards based on the new state of the button
+    filterCards(style);
+}
+
+function toggleButton(button) {
+    // Check if the button is in the active state (green background)
+    if (button.classList.contains('bg-green-400')) {
+        // If active, change to the inactive state (gray background and dark text)
+        button.classList.remove('bg-green-400', 'text-white');
+        button.classList.add('bg-gray-300', 'text-gray-700');
+    } else {
+        // If inactive, change to the active state (green background and white text)
+        button.classList.remove('bg-gray-300', 'text-gray-700');
+        button.classList.add('bg-green-400', 'text-white');
+    }
 }
 
 function filterCards(style) {
-    // first we toggle the state object that keeps track of what is shown:
+    // Toggle the state object that keeps track of what is shown:
     styleState[style] = !styleState[style];
-    // then we grab the cards on the page
+    // Then grab the cards on the page
     const thisStyleCardsOnPage = document.querySelectorAll(`.style-${style}`);
     thisStyleCardsOnPage.forEach(cardOfThisStyle => {
-        if (!styleState[style]) {
+        if (styleState[style]) {
             cardOfThisStyle.classList.remove('hidden');
-          } else {
+        } else {
             cardOfThisStyle.classList.add('hidden');
-          }
+        }
     });
 }
-
-document.getElementById("togglePatterned").addEventListener("click", function() {
-    filterCards("patterned");
-});
-document.getElementById("toggleSubtle").addEventListener("click", function() {
-    filterCards("subtle");
-});
-document.getElementById("toggleNormal").addEventListener("click", function() {
-    filterCards("normal");
-});
