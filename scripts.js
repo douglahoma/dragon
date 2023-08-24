@@ -48,99 +48,29 @@ function getCartProducts() {
 
 // When the cart page loads, fetch products from local storage and then retrieve their details from Firestore
 if (document.getElementById('cartItems')) {
-    const cartItemsElement = document.getElementById('cartItems');
-    const cartProducts = getCartProducts();
     
+const cartItemsElement = document.getElementById('cartItems');
+const cartProducts = getCartProducts();
+    const uniqueCartProductIds = [...new Set(cartProducts.map(p => p.id))];
     
-for(let i = 0; i < cartProducts.length; i++) {
+
+for(let i = 0; i < uniqueCartProductIds.length; i++) {
     let productId = cartProducts[i];
     
-        db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
-            if (doc.exists) {
-                const product = doc.data();
-                const listItem = document.createElement('li');
-                listItem.className = 'flex flex-col justify-between py-2 border-b mb-4';
-                listItem.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold">${product.name}</span>
-                        <span>$${(typeof product.price === "number" ? product.price.toFixed(2) : "N/A")}</span>
-                    </div>
-                    <img src="${product.images && product.images.length > 0 ? product.images[0] : "path/to/default/image.png"}" alt="${product.name}" class="w-32 h-32 object-cover rounded mt-2">
-                    <div>${product.description || "Description not available."}</div>
-                    <div class="mt-2 text-sm text-gray-500">Category: ${product.category || "N/A"}</div>
-                `;
-                cartItemsElement.appendChild(listItem);
-            }
-        });
-    };
+    db.collection('products').doc(typeof productId === "object" ? productId.id : productId).get().then(doc => {
+        if (doc.exists) {
+            const product = doc.data();
+            product.id = doc.id;  // Ensuring the product has its ID
+            renderCartProduct(product);  // Using the previously defined function to render the product with quantity controls
+        }
+    });
 }
+
+            }
 
 document.getElementById('checkoutButton')?.addEventListener('click', () => {
     alert('Proceeding to checkout!');
 });
-
-
-
-
-function displayCartProducts() {
-
-    // Get the cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cartProducts')) || [];
-
-    // Find the container in the HTML to display the cart items
-    const cartContainer = document.getElementById('cartItems');
-    
-    if (cartContainer) {
-        // Clear the container
-        cartContainer.innerHTML = '';
-
-        // Display each product in the cart
-        cart.forEach(product => {
-            db.collection('products').doc(productId.id).get().then((doc) => {
-                if (doc.exists) {
-                    let productDetails = doc.data();
-                    let productElem = document.createElement('li');
-                    productElem.className = 'cart-item';
-                    productElem.innerHTML = `
-                        <h3>${productDetails.name}</h3>
-                        <p>Price: ${productDetails.price}</p>
-                    `;
-                    cartContainer.appendChild(productElem);
-                }
-            });
-        });
-    } else {
-    }
-}
-
-// Function to display cart products in the cart.html page
-function displayCartProductsInUI() {
-    const cartItemsContainer = document.getElementById('cartItems');
-if (!cartItemsContainer) return;
-    const cartProducts = getCartProducts();  // Fetch cart products from localStorage
-    
-    // Clear previous items
-    cartItemsContainer.innerHTML = '';
-    
-    for (let product of cartProducts) {
-        const productElem = document.createElement('li');
-        productElem.className = 'cart-item p-4 border rounded';
-        
-        // Populate the product details.
-        productElem.innerHTML = `
-            
-<h3>${product.name} (Quantity: ${product.quantity})</h3>
-
-            <p>Price: ${product.price}</p>
-        `;
-        
-        // Append the product element to the cartItems container
-        cartItemsContainer.appendChild(productElem);
-    }
-}
-
-// Call the function to display cart products when the cart.html page loads
-document.addEventListener('DOMContentLoaded', displayCartProductsInUI);
 
 function addProductToCart(productId) {
     db.collection('products').doc(productId).get().then(doc => {
@@ -160,7 +90,74 @@ function addProductToCart(productId) {
 function saveCartProducts(cartProducts) {
     localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
 }
+// Function to render cart products
+function renderCartProduct(product) {
+    const cartItemsElement = document.getElementById('cartItems');
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center my-2';
+    
+    const productNameSpan = document.createElement('span');
+    productNameSpan.className = 'product-name';
+    productNameSpan.textContent = product.name;
+    
+    const quantityControlDiv = document.createElement('div');
+    quantityControlDiv.className = 'quantity-control flex items-center';
+    
+    const minusButton = document.createElement('button');
+    minusButton.className = 'minus-btn bg-gray-200 p-2 rounded-l';
+    minusButton.textContent = '-';
+    minusButton.addEventListener('click', () => adjustQuantity(product, -1));
+    
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = product.quantity.toString();
+    input.min = '1';
+    input.className = 'quantity-input w-16 text-center';
+    input.setAttribute('data-product-id', product.id);
+    input.addEventListener('change', adjustQuantityFromInput);
+    
+    const plusButton = document.createElement('button');
+    plusButton.className = 'plus-btn bg-gray-200 p-2 rounded-r';
+    plusButton.textContent = '+';
+    plusButton.addEventListener('click', () => adjustQuantity(product, 1));
+    
+    quantityControlDiv.appendChild(minusButton);
+    quantityControlDiv.appendChild(input);
+    quantityControlDiv.appendChild(plusButton);
+    
+    li.appendChild(productNameSpan);
+    li.appendChild(quantityControlDiv);
+    
+    cartItemsElement.appendChild(li);
+}
 
+// Function to adjust quantity using Plus and Minus buttons
+function adjustQuantity(product, adjustment) {
+    const inputElement = document.querySelector(`.quantity-input[data-product-id="${product.id}"]`);
+    let newQuantity = parseInt(inputElement.value) + adjustment;
+    newQuantity = Math.max(newQuantity, 1);  // Ensure quantity is at least 1
+    inputElement.value = newQuantity;
+    inputElement.dispatchEvent(new Event('change'));
+}
+
+// Function to handle manual input in the quantity text box
+function adjustQuantityFromInput(e) {
+    const productId = e.target.getAttribute('data-product-id');
+    const newQuantity = parseInt(e.target.value);
+
+    // Find product in the cart and update its quantity
+    const productIndex = cart.findIndex(item => item.id === productId);
+    if (productIndex > -1) {
+        cart[productIndex].quantity = newQuantity;
+        saveCartProducts(cart);  // Save the updated cart to localStorage
+    }
+}
+
+// When the cart page loads, fetch products from local storage and then render them using renderCartProduct function
+if (document.getElementById('cartItems')) {
+    const cartProducts = getCartProducts();
+    cartProducts.forEach(product => renderCartProduct(product));
+}
 //
 // end cart stuff
 //
@@ -242,6 +239,8 @@ if ( document.URL.includes("product.html") ){
 function cardMaker(product) {
     const linky = document.createElement('a');
     linky.href = `product.html?id=${product.item}`;
+    // add a style (i.e., category -- normal, patterned, subtle (shirt), decor, pillow (home)) for later filtering
+    linky.classList.add(`style-${product.style}`);
     // Create the main product card container
     const card = document.createElement('div');
     card.className = 'product-card p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform transition duration-300 ease-in-out cursor-pointer w-full max-w-sm mx-auto';
@@ -331,3 +330,34 @@ if ( document.URL.includes("collection.html") ) {
       );
 })
 }}
+
+// make an object to keep track of hidden-ness
+const styleState = {
+    patterned: true,
+    normal: true,
+    subtle: true,
+}
+
+function filterCards(style) {
+    // first we toggle the state object that keeps track of what is shown:
+    styleState[style] = !styleState[style];
+    // then we grab the cards on the page
+    const thisStyleCardsOnPage = document.querySelectorAll(`.style-${style}`);
+    thisStyleCardsOnPage.forEach(cardOfThisStyle => {
+        if (!styleState[style]) {
+            cardOfThisStyle.classList.remove('hidden');
+          } else {
+            cardOfThisStyle.classList.add('hidden');
+          }
+    });
+}
+
+document.getElementById("togglePatterned").addEventListener("click", function() {
+    filterCards("patterned");
+});
+document.getElementById("toggleSubtle").addEventListener("click", function() {
+    filterCards("subtle");
+});
+document.getElementById("toggleNormal").addEventListener("click", function() {
+    filterCards("normal");
+});
